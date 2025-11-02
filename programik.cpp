@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <tuple>
 
 using graph_t = std::vector<std::vector<std::tuple<int, bool>>>;
 
@@ -29,7 +30,7 @@ graph_t wczytaj(int n, int m)
 }
 void wypiszliste(graph_t v)
 {
-	std::cerr << "Lista: \n"; 
+	std::cerr << "Lista: \n";
 	std::cerr <<"v.size(): "<< v.size() << '\n';
 	for(int j = 1; j < v.size(); j++)
 	{
@@ -48,7 +49,7 @@ void wypiszliste(graph_t v)
 
 bool czy_node_ma_cykl(graph_t & graph, size_t index)
 {
-	if (index >= graph.size()) 
+	if (index >= graph.size())
 	{
 		std::cerr <<"index >= graph.size()";
 		return 0;
@@ -59,10 +60,10 @@ bool czy_node_ma_cykl(graph_t & graph, size_t index)
 		if (std::get<1>(graph[index][i]) == true)
 			{
 				// std::cout << "TAK" << std::endl;
-				return 1; 
+				return 1;
 				// continue;
 			}
-			
+
 		size_t target_node = std::get<0>(graph[index][i]);
 		std::get<1>(graph[index][i]) = true;
 		std::cerr <<"test_wypisania\n";
@@ -80,11 +81,11 @@ int main()
         std::cin >>  a;
 	while(a--)
 	{
-		
+
 		int n,m;
 		std::cin >> n >> m;
 		auto v  = wczytaj(n, m);
-	
+
 		wypiszliste(v);
 		for (int i = 1; i <= n; i++)
 		{
@@ -96,6 +97,6 @@ int main()
 
 		}
 	}
-	
+
 }
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <tuple>
 
 using graph_t = std::vector<std::vector<std::tuple<int, bool>>>;
 
@@ -29,7 +30,7 @@ graph_t wczytaj(int n, int m)
 }
 // void wypiszliste(graph_t v)
 // {
-// 	std::cout << "Lista: \n"; 
+// 	std::cout << "Lista: \n";
 // 	//std::cerr << v.size() << '\n';
 // 	for(int j = 1; j < v.size(); j++)
 // 	{
@@ -56,7 +57,7 @@ bool pisz_wezel_rek(graph_t & graph, size_t index, int droga)
 		if (std::get<1>(graph[index][i]) and droga > 2)
 		{
 			// std::cout << "TAK" << std::endl;
-			return 1; 
+			return 1;
 			// continue;
 		}
         if(std::get<1>(graph[index][i]) and droga <= 2)
@@ -88,5 +89,5 @@ int main()
 		else
 			std::cout << "NIE" << std::endl;
     }
-    
+
 }
