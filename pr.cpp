@@ -3,6 +3,8 @@
 #include <set>
 #include <tuple>
 
+constexpr auto INDEX = 0u;
+constexpr auto VISITED = 1u;
 using graph_t = std::vector<std::vector<std::tuple<int, bool>>>;
 
 bool bar(std::set <int> set)
@@ -62,18 +64,19 @@ bool pisz_wezel_rek(graph_t & graph, size_t index, int droga)
 	auto &node = graph[index];
 	for (size_t i = 1; i < node.size(); ++i)
 	{
-		if (std::get<1>(node[i]) and droga > 2)
+		auto &edge = node[i];
+		if (std::get<VISITED>(edge) and (droga > 2))
 		{
 			// std::cout << "TAK" << std::endl;
 			return 1;
 			// continue;
 		}
-        if(std::get<1>(node[i]) and droga <= 2)
+        if(std::get<VISITED>(edge) and droga <= 2)
         {
             return 1;
         }
-		size_t target_node = std::get<0>(graph[index][i]);
-		std::get<1>(node[i]) = true;
+		size_t target_node = std::get<INDEX>(edge);
+		std::get<VISITED>(edge) = true;
 		return pisz_wezel_rek(graph, target_node, droga+1);
 		// return 0;
 	}
