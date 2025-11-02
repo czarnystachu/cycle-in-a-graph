@@ -14,19 +14,25 @@ bool bar(std::set <int> set)
 	return false;
 }
 
-graph_t wczytaj(int n, int m)
+void dodaj_krawedz(graph_t &v, int a, int b)
+{
+    v[a].push_back(std::make_tuple(b, false));
+    v[b].push_back(std::make_tuple(a, false));
+}
+
+graph_t wczytaj_graf(int n, int m)
 {
 	graph_t v;
-        v.resize(n+1);
+	v.resize(n + 1);
 
-        for(int i = 0; i < m; i++)
-        {
-                int a, b;
-                std::cin >> a >> b;
-				v[a].push_back(std::make_tuple(b, false));
-				v[b].push_back(std::make_tuple(a, false));
-		}
-		return v;
+	for (int i = 0; i < m; i++)
+	{
+		int a, b;
+		std::cin >> a >> b;
+		dodaj_krawedz(v, a, b);
+	}
+
+	return v;
 }
 // void wypiszliste(graph_t v)
 // {
@@ -51,21 +57,23 @@ bool pisz_wezel_rek(graph_t & graph, size_t index, int droga)
 		return 0;
 	}
 
-	std::cerr << "node: " << index << std::endl;
-	for (size_t i = 1; i < graph[index].size(); ++i)
+	std::cerr << "node : " << index << std::endl;
+	std::cerr << "droga: " << droga << std::endl;
+	auto &node = graph[index];
+	for (size_t i = 1; i < node.size(); ++i)
 	{
-		if (std::get<1>(graph[index][i]) and droga > 2)
+		if (std::get<1>(node[i]) and droga > 2)
 		{
 			// std::cout << "TAK" << std::endl;
 			return 1;
 			// continue;
 		}
-        if(std::get<1>(graph[index][i]) and droga <= 2)
+        if(std::get<1>(node[i]) and droga <= 2)
         {
             return 1;
         }
 		size_t target_node = std::get<0>(graph[index][i]);
-		std::get<1>(graph[index][i]) = true;
+		std::get<1>(node[i]) = true;
 		return pisz_wezel_rek(graph, target_node, droga+1);
 		// return 0;
 	}
@@ -81,7 +89,7 @@ int main()
 
 		int n,m;
 		std::cin >> n >> m;
-		auto v  = wczytaj(n, m);
+		auto v  = wczytaj_graf(n, m);
 	//}
 
 		if(pisz_wezel_rek(v, 1, 0))
