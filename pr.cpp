@@ -7,15 +7,6 @@ constexpr auto INDEX = 0u;
 constexpr auto VISITED = 1u;
 using graph_t = std::vector<std::vector<std::tuple<int, bool>>>;
 
-bool bar(std::set <int> set)
-{
-	for(const auto element : set)
-	{
-		// bar(v[element])
-	}
-	return false;
-}
-
 void dodaj_krawedz(graph_t &v, int a, int b)
 {
     v[a].push_back(std::make_tuple(b, false));
@@ -36,69 +27,103 @@ graph_t wczytaj_graf(int n, int m)
 
 	return v;
 }
-// void wypiszliste(graph_t v)
-// {
-// 	std::cout << "Lista: \n";
-// 	//std::cerr << v.size() << '\n';
-// 	for(int j = 1; j < v.size(); j++)
-// 	{
-//         	std::cout << j <<":";
 
-//         	for(const auto element : v[j])
-//         	{
-//         		std::cout <<" "<< element;
-//         	}
-// 	std::cout <<'\n' ;
-//     	}
-
-// }
-
-bool pisz_wezel_rek(graph_t & graph, size_t index, int droga)
+std::set<std::tuple<int, int>> visitedEdges;
+bool contains(const std::set<std::tuple<int, int>> &heystack, const std::tuple<int, int> &needle)
 {
-	if (index >= graph.size()) {
+	return (heystack.find(needle) != heystack.cend());
+}
+
+void wypiszliste(const graph_t &v)
+{
+	std::cerr << "Lista: \n";
+	// std::cerr << v.size() << '\n';
+	for (int j = 1; j < v.size(); j++)
+	{
+		std::cerr << j << ":";
+
+		for (const auto &element : v[j])
+		{
+			std::cerr << " " << std::get<INDEX>(element)
+					<< " (" << std::boolalpha << contains(visitedEdges, {j, std::get<INDEX>(element)}) << ")";
+		}
+		std::cerr << '\n';
+	}
+}
+
+
+static std::string path;
+bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent)
+{
+	if (current >= graph.size()) {
 		return 0;
 	}
 
-	std::cerr << "node : " << index << std::endl;
-	std::cerr << "droga: " << droga << std::endl;
-	auto &node = graph[index];
-	for (size_t i = 1; i < node.size(); ++i)
+	path += std::to_string(current) + " -> ";
+	// std::cerr << "droga: " << droga << std::endl;
+
+	auto &node = graph[current];
+
+	for (size_t edgeIndex = 0; edgeIndex < node.size(); ++edgeIndex)
 	{
-		auto &edge = node[i];
-		if (std::get<VISITED>(edge) and (droga > 2))
+		auto &edge = node[edgeIndex];
+		size_t targetNodeIndex = std::get<INDEX>(edge);
+
+		if (targetNodeIndex == parent)
+		{
+			continue;
+		}
+
+		if (contains(visitedEdges, {current, targetNodeIndex}))
 		{
 			// std::cout << "TAK" << std::endl;
-			return 1;
+			return (droga > 2) ? true : false;
 			// continue;
 		}
-        if(std::get<VISITED>(edge) and droga <= 2)
-        {
-            return 1;
-        }
-		size_t target_node = std::get<INDEX>(edge);
-		std::get<VISITED>(edge) = true;
-		return pisz_wezel_rek(graph, target_node, droga+1);
+
+        // if(std::get<VISITED>(edge) and droga <= 2)
+        // {
+        //     return 1;
+        // }
+
+		visitedEdges.insert({current, targetNodeIndex});
+		visitedEdges.insert({targetNodeIndex, current});
+		// std::get<VISITED>(edge) = true;
+
+		return pisz_wezel_rek(graph, targetNodeIndex, droga+1, current);
 		// return 0;
 	}
-	return pisz_wezel_rek(graph, index+1, 0);
+
+	return 0;
+
+	// return pisz_wezel_rek(graph, current+1, 0);
 }
 
 int main()
 {
-        int a;
-        std::cin >>  a;
+	int a;
+	std::cin >>  a;
 	while(a--)
 	{
 
 		int n,m;
 		std::cin >> n >> m;
 		auto v  = wczytaj_graf(n, m);
-	//}
 
-		if(pisz_wezel_rek(v, 1, 0))
-			std::cout << "TAK" << std::endl;
-		else
-			std::cout << "NIE" << std::endl;
+		// wypiszliste(v);
+
+		visitedEdges.clear();
+		auto cycled = false;
+		for (auto i = 1u; i < v.size() && !cycled; ++i)
+		{
+			path.clear();
+			cycled |= pisz_wezel_rek(v, i, 0, -1);
+			// std::cerr << path << " ." << std::endl;
+		}
+
+		// wypiszliste(v);
+
+		std::cout << (cycled ? "TAK" : "NIE") << std::endl;
     }
 
 }
