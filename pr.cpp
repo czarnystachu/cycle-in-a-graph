@@ -129,10 +129,10 @@ int main()
 			cycled |= pisz_wezel_rek(v, i, 0, -1);
 			// std::cerr << path << " ." << std::endl;
 		}
-
+		auto even = czy_ma_cykl(v);
 		// wypiszliste(v);
 
-		std::cout << (cycled ? "TAK" : "NIE") << std::endl;
+		std::cout << ((cycled || even) ? "TAK" : "NIE") << std::endl;
     }
 
 }
