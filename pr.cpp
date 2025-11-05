@@ -98,6 +98,15 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 
 	// return pisz_wezel_rek(graph, current+1, 0);
 }
+bool czy_ma_cykl(const graph_t & graph)
+{
+	for (const auto nodes : graph)
+	{
+		if (nodes.size() % 2 != 0)
+		return 0; 
+	}
+	return 1;
+}
 
 int main()
 {
