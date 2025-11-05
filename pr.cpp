@@ -5,13 +5,13 @@
 #include <array>
 #include <bitset>
 
-std::bitset <100001> visited_nodes; 
-using graph_t = std::vector<std::vector<int>>;
+std::bitset <100001> visited; 
+using graph_t = std::vector<std::set<size_t>>;
 
 void dodaj_krawedz(graph_t &v, int a, int b)
 {
-    v[a].push_back(b);
-    v[b].push_back(a);
+    v[a].insert(b);
+    v[b].insert(a);
 }
 
 graph_t wczytaj_graf(int n, int m)
@@ -29,24 +29,15 @@ graph_t wczytaj_graf(int n, int m)
 	return v;
 }
 
-// std::set<int> visitedEdges;
-// bool contains(const std::set<std::tuple<int, int>> &heystack, const std::tuple<int, int> &needle)
-// {
-// 	return (heystack.find(needle) != heystack.cend());
-// }
-
 void wypiszliste(const graph_t &v)
 {
 	std::cerr << "Lista: \n";
-	// std::cerr << v.size() << '\n';
 	for (auto j = 1u; j < v.size(); j++)
 	{
 		std::cerr << j << ":";
-
 		for (const auto &element : v[j])
 		{
 			std::cerr << " " << element;
-			//	<< " (" << std::boolalpha << contains(visitedEdges, {j, std::get<INDEX>(element)}) << ")";
 		}
 		std::cerr << '\n';
 	}
@@ -59,8 +50,9 @@ bool czy_ma_cykl_bo_parzysty(const graph_t & graph)
 		return false;
 	}
 	
-	for (const auto &nodes : graph)
+	for (auto i = 1u; i < graph.size(); i++)
 	{
+		const auto &nodes = graph[i];
 		if ((nodes.size() == 0) ||
 		    ((nodes.size() % 2) != 0))
 		{
@@ -70,12 +62,31 @@ bool czy_ma_cykl_bo_parzysty(const graph_t & graph)
 	return true;
 }
 
+bool dfs (const graph_t &graph, size_t current , size_t parent)
+{
+	auto node = graph[current];
+	std::cerr << "current: " <<current<<'\n';
+	visited[current] = true;
+	for (const auto somsiad : node)
+	{
+		if(visited[somsiad] == false)
+		{
+			return dfs (graph, somsiad, current);
+		}else if(current != parent)
+		{
+			return 1;
+		}
+	} 
+}
+
+
+
 void print_visited_nodes()
 {
     std::cerr << "array:\n";
     for (int i = 0; i < 20; i++)
     {
-        std::cerr << std::boolalpha << visited_nodes[i] << ' ';
+        std::cerr << std::boolalpha << visited[i] << ' ';
 
     }
     std::cerr << "\n";
@@ -83,70 +94,72 @@ void print_visited_nodes()
 
 static std::string path;
 
-bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, size_t parent)
+bool DFS(const graph_t & graph, size_t current, int droga, size_t parent)
 {
-	if (current >= graph.size()) {
+	path += std::to_string(current) + " -> ";   //debagowanie
+	
+	if (current >= graph.size())
+	{
 		return 0;
 	}
 
-	path += std::to_string(current) + " -> ";   //debagowanie
-
+	visited[current] = true;
 	auto &node = graph[current];
 	
-	for (size_t node_index = 0; node_index < node.size(); ++node_index)
+	for (const auto target : node)
 	{
-		auto &edge = node[node_index];
-		size_t targetNodeIndex = edge;
-
-		if (targetNodeIndex == parent)
+		if (target == parent)
 		{
 			continue;
 		}
-		if (visited_nodes[current] == true)
+
+		if (visited[target] == true)
 		{
 			return (droga > 2) ? true : false;
 		}
 
-		visited_nodes[current] = true;
-
-		return pisz_wezel_rek(graph, targetNodeIndex, droga+1, current);
+		if (DFS(graph, target, droga+1, current))
+		{
+			return true;
+		}
 	}
-
 	return 0;
 }
 
-
-
 int main()
 {
-	int a;
-	std::cin >> a;
-	while(a--)
-	{
+// 	int a;
+// 	std::cin >> a;
+// 	while(a--)
+// 	{
 
-		int n,m;
-		std::cin >> n >> m;
-		auto v  = wczytaj_graf(n, m);
-		while(n)
-		{
-			visited_nodes[n] = 0;
-			--n;
-		}
-        // wypiszliste(v);
+// 		int n,m;
+// 		std::cin >> n >> m;
+// 		auto v  = wczytaj_graf(n, m);
+// 		while(n)
+// 		{
+// 			visited_nodes[n] = 0;
+// 			--n;
+// 		}
+//          wypiszliste(v);
 
-		auto cycled = false;
-		for (auto i = 1u; i < v.size() && !cycled; ++i)
-		{
-			path.clear();
-			cycled |= pisz_wezel_rek(v, i, 0, -1);
-			 //std::cerr << path << " ." << std::endl;
-		}
-		auto even = czy_ma_cykl_bo_parzysty(v);
-		// wypiszliste(v);
-        //print_visited_nodes();
-		//std::cerr << visited_nodes <<'\n';
-		std::cout << ((cycled || even) ? "TAK" : "NIE") << std::endl;
-    }
+// 		auto cycled = false;
+// 		for (auto i = 1u; i < v.size() && !cycled; ++i)
+// 		{
+// 			path.clear();
+// 			cycled |= DFS(v, i, 0, -1);
+// 			std::cerr << path << " ." << std::endl;
+// 		}
+// 		auto even = czy_ma_cykl_bo_parzysty(v);
+// 		//std::cerr << even << std::endl;
+// 		// wypiszliste(v);
+//         //print_visited_nodes();
+// 		//std::cerr << visited_nodes <<'\n';
+// 		std::cout << ((cycled || even) ? "TAK" : "NIE") << std::endl;
+//     }
+auto v = wczytaj_graf(3,3);
+print_visited_nodes();
+wypiszliste(v);
+dfs (v, 1, 0);
 
 }
-
