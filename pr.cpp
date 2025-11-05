@@ -39,7 +39,7 @@ void wypiszliste(const graph_t &v)
 {
 	std::cerr << "Lista: \n";
 	// std::cerr << v.size() << '\n';
-	for (int j = 1; j < v.size(); j++)
+	for (auto j = 1u; j < v.size(); j++)
 	{
 		std::cerr << j << ":";
 
@@ -50,6 +50,24 @@ void wypiszliste(const graph_t &v)
 		}
 		std::cerr << '\n';
 	}
+}
+
+bool czy_ma_cykl_bo_parzysty(const graph_t & graph)
+{
+	if(graph.empty())
+	{
+		return false;
+	}
+	
+	for (const auto &nodes : graph)
+	{
+		if ((nodes.size() == 0) ||
+		    ((nodes.size() % 2) != 0))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 void print_visited_nodes()
@@ -65,9 +83,7 @@ void print_visited_nodes()
 
 static std::string path;
 
-
-
-bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent)
+bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, size_t parent)
 {
 	if (current >= graph.size()) {
 		return 0;
@@ -76,15 +92,10 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 	path += std::to_string(current) + " -> ";   //debagowanie
 
 	auto &node = graph[current];
-
-	// if(visited_nodes[current] == 1)
-	// {
-	// 	return true;
-	// }
 	
-	for (size_t edgeIndex = 0; edgeIndex < node.size(); ++edgeIndex)
+	for (size_t node_index = 0; node_index < node.size(); ++node_index)
 	{
-		auto &edge = node[edgeIndex];
+		auto &edge = node[node_index];
 		size_t targetNodeIndex = edge;
 
 		if (targetNodeIndex == parent)
@@ -95,8 +106,8 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 		{
 			return (droga > 2) ? true : false;
 		}
-		visited_nodes[current] = true;
 
+		visited_nodes[current] = true;
 
 		return pisz_wezel_rek(graph, targetNodeIndex, droga+1, current);
 	}
@@ -104,29 +115,22 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 	return 0;
 }
 
-bool czy_ma_cykl(const graph_t & graph)
-{
-	for (const auto &nodes : graph)
-	{
-		if (nodes.size() % 2 != 0)
-		return 0; 
-	}
-	return 1;
-}
+
 
 int main()
 {
 	int a;
-	std::cin >>  a;
+	std::cin >> a;
 	while(a--)
 	{
 
 		int n,m;
 		std::cin >> n >> m;
 		auto v  = wczytaj_graf(n, m);
-		while(n--)
+		while(n)
 		{
 			visited_nodes[n] = 0;
+			--n;
 		}
         // wypiszliste(v);
 
@@ -137,11 +141,11 @@ int main()
 			cycled |= pisz_wezel_rek(v, i, 0, -1);
 			 //std::cerr << path << " ." << std::endl;
 		}
-		auto even = czy_ma_cykl(v);
+		auto even = czy_ma_cykl_bo_parzysty(v);
 		// wypiszliste(v);
         //print_visited_nodes();
 		//std::cerr << visited_nodes <<'\n';
-		std::cout << ((cycled) ? "TAK" : "NIE") << std::endl;
+		std::cout << ((cycled || even) ? "TAK" : "NIE") << std::endl;
     }
 
 }
