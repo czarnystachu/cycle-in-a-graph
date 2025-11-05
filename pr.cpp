@@ -65,18 +65,19 @@ bool czy_ma_cykl_bo_parzysty(const graph_t & graph)
 bool dfs (const graph_t &graph, size_t current , size_t parent)
 {
 	auto node = graph[current];
-	std::cerr << "current: " <<current<<'\n';
 	visited[current] = true;
 	for (const auto somsiad : node)
 	{
 		if(visited[somsiad] == false)
 		{
 			return dfs (graph, somsiad, current);
-		}else if(current != parent)
+		}
+		if(visited[somsiad] == true && current != parent)
 		{
-			return 1;
+			return true;
 		}
 	} 
+	return false;
 }
 
 
@@ -84,9 +85,9 @@ bool dfs (const graph_t &graph, size_t current , size_t parent)
 void print_visited_nodes()
 {
     std::cerr << "array:\n";
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < 5; i++)
     {
-        std::cerr << std::boolalpha << visited[i] << ' ';
+        std::cerr  << visited[i] << ' ';
 
     }
     std::cerr << "\n";
@@ -157,9 +158,20 @@ int main()
 // 		//std::cerr << visited_nodes <<'\n';
 // 		std::cout << ((cycled || even) ? "TAK" : "NIE") << std::endl;
 //     }
-auto v = wczytaj_graf(3,3);
-print_visited_nodes();
-wypiszliste(v);
-dfs (v, 1, 0);
-
+int a;
+size_t IOOOOO = 100001;
+std::cin>>a;
+while (a--)
+{
+	int n,m;
+	std::cin >>n>>m;
+	for (size_t i = 0; i < IOOOOO; i++)
+	{
+		visited[i] = 0;
+	}
+	auto v = wczytaj_graf(n,m);
+	//print_visited_nodes();
+	//wypiszliste(v);
+	std::cout <<( dfs (v, 1, 0) ? "TAK" : "NIE")<<'\n';
+}
 }
