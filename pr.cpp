@@ -53,6 +53,16 @@ void wypiszliste(const graph_t &v)
 	}
 }
 
+void print_visited_nodes()
+{
+    std::cerr << "array:\n";
+    for (int i = 0; i < 20; i++)
+    {
+        std::cerr << std::boolalpha << visited_nodes[i] << ' ';
+
+    }
+    std::cerr << "\n";
+}
 
 static std::string path;
 bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent)
@@ -64,7 +74,12 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 	path += std::to_string(current) + " -> ";   //debagowanie
 
 	auto &node = graph[current];
-	visited_nodes[current] == true;
+
+	// if(visited_nodes[current] == 1)
+	// {
+	// 	return true;
+	// }
+	
 	for (size_t edgeIndex = 0; edgeIndex < node.size(); ++edgeIndex)
 	{
 		auto &edge = node[edgeIndex];
@@ -74,14 +89,19 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 		{
 			continue;
 		}
-
-		if (contains(visitedEdges, {current, targetNodeIndex}))
+		if (visited_nodes[current] == true)
 		{
 			return (droga > 2) ? true : false;
 		}
+		visited_nodes[current] = true;
 
-		visitedEdges.insert({current, targetNodeIndex});
-		visitedEdges.insert({targetNodeIndex, current});
+		// if (contains(visitedEdges, {current, targetNodeIndex}))
+		// {
+		// 	return (droga > 2) ? true : false;
+		// }
+
+		// visitedEdges.insert({current, targetNodeIndex});
+		// visitedEdges.insert({targetNodeIndex, current});
 		
 
 		return pisz_wezel_rek(graph, targetNodeIndex, droga+1, current);
@@ -89,9 +109,10 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 
 	return 0;
 }
+
 bool czy_ma_cykl(const graph_t & graph)
 {
-	for (const auto nodes : graph)
+	for (const auto &nodes : graph)
 	{
 		if (nodes.size() % 2 != 0)
 		return 0; 
@@ -109,14 +130,8 @@ int main()
 		int n,m;
 		std::cin >> n >> m;
 		auto v  = wczytaj_graf(n, m);
-		std::cerr <<"array:\n";
-		for(int i = 0; i < 20; i++)
-		{
-			std::cerr << visited_nodes[i] <<' ';
-		}
-		std::cerr <<"\n";
 
-		// wypiszliste(v);
+        // wypiszliste(v);
 
 		visitedEdges.clear();
 		auto cycled = false;
@@ -128,8 +143,10 @@ int main()
 		}
 		auto even = czy_ma_cykl(v);
 		// wypiszliste(v);
+        //print_visited_nodes();
 
 		std::cout << ((cycled || even) ? "TAK" : "NIE") << std::endl;
     }
 
 }
+
