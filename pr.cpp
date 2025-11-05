@@ -3,16 +3,15 @@
 #include <set>
 #include <tuple>
 #include <array>
+#include <bitset>
 
-std::array <bool, 100001> visited_nodes;
-constexpr auto INDEX = 0u;
-constexpr auto VISITED = 1u;
-using graph_t = std::vector<std::vector<std::tuple<int, bool>>>;
+std::bitset <100001> visited_nodes; 
+using graph_t = std::vector<std::vector<int>>;
 
 void dodaj_krawedz(graph_t &v, int a, int b)
 {
-    v[a].push_back(std::make_tuple(b, false));
-    v[b].push_back(std::make_tuple(a, false));
+    v[a].push_back(b);
+    v[b].push_back(a);
 }
 
 graph_t wczytaj_graf(int n, int m)
@@ -30,11 +29,11 @@ graph_t wczytaj_graf(int n, int m)
 	return v;
 }
 
-std::set<std::tuple<int, int>> visitedEdges;
-bool contains(const std::set<std::tuple<int, int>> &heystack, const std::tuple<int, int> &needle)
-{
-	return (heystack.find(needle) != heystack.cend());
-}
+// std::set<int> visitedEdges;
+// bool contains(const std::set<std::tuple<int, int>> &heystack, const std::tuple<int, int> &needle)
+// {
+// 	return (heystack.find(needle) != heystack.cend());
+// }
 
 void wypiszliste(const graph_t &v)
 {
@@ -46,8 +45,8 @@ void wypiszliste(const graph_t &v)
 
 		for (const auto &element : v[j])
 		{
-			std::cerr << " " << std::get<INDEX>(element)
-					<< " (" << std::boolalpha << contains(visitedEdges, {j, std::get<INDEX>(element)}) << ")";
+			std::cerr << " " << element;
+			//	<< " (" << std::boolalpha << contains(visitedEdges, {j, std::get<INDEX>(element)}) << ")";
 		}
 		std::cerr << '\n';
 	}
@@ -65,6 +64,9 @@ void print_visited_nodes()
 }
 
 static std::string path;
+
+
+
 bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent)
 {
 	if (current >= graph.size()) {
@@ -83,7 +85,7 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 	for (size_t edgeIndex = 0; edgeIndex < node.size(); ++edgeIndex)
 	{
 		auto &edge = node[edgeIndex];
-		size_t targetNodeIndex = std::get<INDEX>(edge);
+		size_t targetNodeIndex = edge;
 
 		if (targetNodeIndex == parent)
 		{
@@ -95,14 +97,6 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 		}
 		visited_nodes[current] = true;
 
-		// if (contains(visitedEdges, {current, targetNodeIndex}))
-		// {
-		// 	return (droga > 2) ? true : false;
-		// }
-
-		// visitedEdges.insert({current, targetNodeIndex});
-		// visitedEdges.insert({targetNodeIndex, current});
-		
 
 		return pisz_wezel_rek(graph, targetNodeIndex, droga+1, current);
 	}
@@ -130,22 +124,24 @@ int main()
 		int n,m;
 		std::cin >> n >> m;
 		auto v  = wczytaj_graf(n, m);
-
+		while(n--)
+		{
+			visited_nodes[n] = 0;
+		}
         // wypiszliste(v);
 
-		visitedEdges.clear();
 		auto cycled = false;
 		for (auto i = 1u; i < v.size() && !cycled; ++i)
 		{
 			path.clear();
 			cycled |= pisz_wezel_rek(v, i, 0, -1);
-			// std::cerr << path << " ." << std::endl;
+			 //std::cerr << path << " ." << std::endl;
 		}
 		auto even = czy_ma_cykl(v);
 		// wypiszliste(v);
         //print_visited_nodes();
-
-		std::cout << ((cycled || even) ? "TAK" : "NIE") << std::endl;
+		//std::cerr << visited_nodes <<'\n';
+		std::cout << ((cycled) ? "TAK" : "NIE") << std::endl;
     }
 
 }
