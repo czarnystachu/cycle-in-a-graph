@@ -2,7 +2,9 @@
 #include <vector>
 #include <set>
 #include <tuple>
+#include <array>
 
+std::array <bool, 100001> visited_nodes;
 constexpr auto INDEX = 0u;
 constexpr auto VISITED = 1u;
 using graph_t = std::vector<std::vector<std::tuple<int, bool>>>;
@@ -59,11 +61,10 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 		return 0;
 	}
 
-	path += std::to_string(current) + " -> ";
-	// std::cerr << "droga: " << droga << std::endl;
+	path += std::to_string(current) + " -> ";   //debagowanie
 
 	auto &node = graph[current];
-
+	visited_nodes[current] == true;
 	for (size_t edgeIndex = 0; edgeIndex < node.size(); ++edgeIndex)
 	{
 		auto &edge = node[edgeIndex];
@@ -76,27 +77,17 @@ bool pisz_wezel_rek(const graph_t & graph, size_t current, int droga, int parent
 
 		if (contains(visitedEdges, {current, targetNodeIndex}))
 		{
-			// std::cout << "TAK" << std::endl;
 			return (droga > 2) ? true : false;
-			// continue;
 		}
-
-        // if(std::get<VISITED>(edge) and droga <= 2)
-        // {
-        //     return 1;
-        // }
 
 		visitedEdges.insert({current, targetNodeIndex});
 		visitedEdges.insert({targetNodeIndex, current});
-		// std::get<VISITED>(edge) = true;
+		
 
 		return pisz_wezel_rek(graph, targetNodeIndex, droga+1, current);
-		// return 0;
 	}
 
 	return 0;
-
-	// return pisz_wezel_rek(graph, current+1, 0);
 }
 bool czy_ma_cykl(const graph_t & graph)
 {
@@ -118,6 +109,12 @@ int main()
 		int n,m;
 		std::cin >> n >> m;
 		auto v  = wczytaj_graf(n, m);
+		std::cerr <<"array:\n";
+		for(int i = 0; i < 20; i++)
+		{
+			std::cerr << visited_nodes[i] <<' ';
+		}
+		std::cerr <<"\n";
 
 		// wypiszliste(v);
 
